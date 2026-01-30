@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Folio Integrated Marketing Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="folio-main-image-removebg-preview.png">
+    <style>
+        body {
+            background-color: #f6f9fc;
+            /* Stripe-style background accent */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: left;
+        }
+
+        [data-theme="dark"] body {
+            background-color: #1a1a1a;
+        }
+
+        .checkout-container {
+            background: var(--bg-card);
+            max-width: 900px;
+            width: 95%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-radius: var(--radius);
+            box-shadow: 0 15px 35px rgba(50, 50, 93, .1), 0 5px 15px rgba(0, 0, 0, .07);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .order-summary {
+            background: #fff;
+            padding: 60px 40px;
+            border-right: 1px solid #f1f4f8;
+        }
+
+        [data-theme="dark"] .order-summary {
+            background: #2c2c2e;
+            border-right: 1px solid #3a3a3c;
+        }
+
+        .payment-info {
+            padding: 60px 40px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 40px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .brand-name {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: var(--text-muted);
+        }
+
+        .price-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--text-main);
+        }
+
+        .item-name {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #e6ebf1;
+            border-radius: 4px;
+            background: #fff;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+
+        [data-theme="dark"] input {
+            background: #1c1c1e;
+            border-color: #3a3a3c;
+            color: #fff;
+        }
+
+        input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 1px var(--primary-blue);
+            outline: none;
+        }
+
+        .stripe-footer {
+            margin-top: 40px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .stripe-logo {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #6772e5;
+        }
+
+        /* Luxury Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .modal-body h2 {
+            font-family: var(--font-heading);
+            margin-bottom: 20px;
+        }
+
+        .modal-body p {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .stripe-footer a {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Top-Corner Theme Toggle */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #theme-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--primary-blue);
+        }
+
+        [data-theme="dark"] #theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <button id="theme-toggle" aria-label="Toggle Dark Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+    <div class="checkout-container">
+        <!-- Left Side: Summary -->
+        <div class="order-summary">
+            <div class="back-link" onclick="window.history.back()">&larr; Back</div>
+            <div class="brand-name">Folio Integrated Marketing Services</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Pay Folio Integrated Marketing Services
+            </p>
+            <h1 class="price-display">$5,000.00</h1>
+            <h2 class="item-name">Brand Refocus & Improvements</h2>
+            <div style="margin-top: 40px;">
+                <img src="folio-main-image-removebg-preview.png" style="height: 40px; opacity: 0.5;">
+            </div>
+        </div>
+
+        <!-- Right Side: Interaction -->
+        <div class="payment-info">
+            <h3 style="margin-top: 0; margin-bottom: 30px; font-weight: 500;">Payment Details</h3>
+            <form
+                onsubmit="event.preventDefault(); alert('This is a simulation. In a real environment, this would securely process via Stripe.');">
+                <label for="email">Email address</label>
+                <input type="email" id="email" placeholder="email@example.com" required>
+
+                <label>Card information</label>
+                <input type="text" placeholder="1234 5678 1234 5678" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <input type="text" placeholder="MM / YY" required>
+                    <input type="text" placeholder="CVC" required>
+                </div>
+
+                <label for="name">Name on card</label>
+                <input type="text" id="name" placeholder="Full name on card" required>
+
+                <label for="country">Country or region</label>
+                <input type="text" id="country" value="United States" required>
+
+                <button type="submit" class="cta-button" style="width: 100%; margin: 20px 0;">Pay $5,000.00</button>
+            </form>
+
+            <div class="stripe-footer">
+                Powered by <span class="stripe-logo">stripe</span> |
+                <a onclick="showModal('terms')">Terms</a> |
+                <a onclick="showModal('privacy')">Privacy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modal-body" class="modal-body">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const content = {
+            terms: {
+                title: "Terms of Service",
+                body: `
+                    <p>Welcome to Folio Integrated Marketing Services. By engaging with our private office, you agree to the following exclusive terms:</p>
+                    <p><strong>1. Retainer & Engagement:</strong> All premium strategy services require a 50% non-refundable retainer before project commencement.</p>
+                    <p><strong>2. Confidentiality:</strong> As a boutique firm, we maintain strict non-disclosure of all client identities and proprietary marketing data.</p>
+                    <p><strong>3. Intellectual Property:</strong> Upon final payment, all creative assets and strategic frameworks become the sole property of the client.</p>
+                    <p><strong>4. Revisions:</strong> High-net-worth engagements include unlimited conceptual revisions within the first 30 days of project launch.</p>
+                `
+            },
+            privacy: {
+                title: "Privacy Policy",
+                body: `
+                    <p>Your privacy is our highest priority at Folio. We operate a "Zero-Leak" data policy.</p>
+                    <p><strong>Data Collection:</strong> We only collect information essential for strategic marketing execution and secure financial transactions.</p>
+                    <p><strong>Storage:</strong> All sensitive client data is stored on encrypted, offline-accessible servers to prevent digital intrusion.</p>
+                    <p><strong>Third Parties:</strong> We never sell, trade, or share client information with outside vendors without explicit, written consent from the account holder.</p>
+                    <p><strong>Security:</strong> All transactions are processed through end-to-end encrypted tunnels via Stripe PCI-compliant infrastructure.</p>
+                `
+            }
+        };
+
+        function showModal(type) {
+            const modal = document.getElementById('modal-overlay');
+            const body = document.getElementById('modal-body');
+
+            body.innerHTML = `<h2>${content[type].title}</h2>${content[type].body}`;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeModal(event) {
+            const modal = document.getElementById('modal-overlay');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
